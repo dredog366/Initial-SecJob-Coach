@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Home - SecJob Coach{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1>🛡️ Welcome to SecJob Coach</h1>
+        <p class="hero-subtitle">Your comprehensive study platform for Cybersecurity and SOC Analyst careers</p>
+        <div class="hero-buttons">
+            <a href="/modules" class="btn btn-primary">Start Learning</a>
+            <a href="/quiz" class="btn btn-secondary">Take a Quiz</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <section class="features">
+        <h2>What You'll Learn</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>SOC Fundamentals</h3>
+                <p>Learn the core concepts of Security Operations Centers, analyst tiers, and SIEM tools.</p>
+                <a href="/module/soc_fundamentals" class="feature-link">Explore →</a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🚨</div>
+                <h3>Incident Response</h3>
+                <p>Master the incident response lifecycle and learn to handle security incidents effectively.</p>
+                <a href="/module/incident_response" class="feature-link">Explore →</a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Threat Intelligence</h3>
+                <p>Understand threat intelligence types, MITRE ATT&CK framework, and IOCs.</p>
+                <a href="/module/threat_intelligence" class="feature-link">Explore →</a>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🌐</div>
+                <h3>Network Security</h3>
+                <p>Study network security fundamentals, log analysis, and threat detection.</p>
+                <a href="/module/network_security" class="feature-link">Explore →</a>
+            </div>
+        </div>
+    </section>
+    
+    <section class="study-tools">
+        <h2>Study Tools</h2>
+        <div class="tools-grid">
+            <div class="tool-card">
+                <h3>📝 Interactive Quiz</h3>
+                <p>Test your knowledge with curated questions covering all key topics.</p>
+                <a href="/quiz" class="btn btn-primary">Take Quiz</a>
+            </div>
+            
+            <div class="tool-card">
+                <h3>🃏 Flashcards</h3>
+                <p>Review key terms and definitions to reinforce your learning.</p>
+                <a href="/flashcards" class="btn btn-primary">Study Flashcards</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - SecJob Coach{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="quiz-container">
+        <div id="quiz-start" class="quiz-section active">
+            <h1>📝 Cybersecurity Knowledge Quiz</h1>
+            <p class="quiz-description">Test your knowledge of SOC analyst fundamentals, incident response, threat intelligence, and network security.</p>
+            <div class="quiz-info">
+                <p>✓ 10 Multiple Choice Questions</p>
+                <p>✓ Instant Feedback</p>
+                <p>✓ Detailed Explanations</p>
+            </div>
+            <button id="start-quiz-btn" class="btn btn-primary btn-large">Start Quiz</button>
+        </div>
+        
+        <div id="quiz-question" class="quiz-section">
+            <div class="quiz-progress">
+                <span id="question-number"></span>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+            
+            <h2 id="question-text"></h2>
+            
+            <div id="options-container" class="options-container"></div>
+            
+            <div id="feedback" class="feedback"></div>
+            
+            <button id="next-btn" class="btn btn-primary" style="display: none;">Next Question</button>
+        </div>
+        
+        <div id="quiz-results" class="quiz-section">
+            <h1>🎉 Quiz Complete!</h1>
+            <div class="results-summary">
+                <div class="score-circle">
+                    <div class="score-text">
+                        <span id="score-percentage"></span>
+                        <span class="score-label">Score</span>
+                    </div>
+                </div>
+                <p class="results-text">You got <strong id="score-count"></strong> out of <strong id="total-count"></strong> questions correct!</p>
+            </div>
+            
+            <div id="performance-message" class="performance-message"></div>
+            
+            <div class="results-actions">
+                <button id="retry-quiz-btn" class="btn btn-primary">Retake Quiz</button>
+                <a href="/modules" class="btn btn-secondary">Study More</a>
+            </div>
+            
+            <div id="answer-review" class="answer-review"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentQuestionData = null;
+
+document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+document.getElementById('retry-quiz-btn').addEventListener('click', startQuiz);
+
+async function startQuiz() {
+    try {
+        const response = await fetch('/api/quiz/start', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showSection('quiz-question');
+            loadQuestion();
+        }
+    } catch (error) {
+        console.error('Error starting quiz:', error);
+    }
+}
+
+async function loadQuestion() {
+    try {
+        const response = await fetch('/api/quiz/question');
+        const data = await response.json();
+        
+        if (data.completed) {
+            showResults();
+            return;
+        }
+        
+        currentQuestionData = data;
+        
+        document.getElementById('question-number').textContent = `Question ${data.number} of ${data.total}`;
+        document.getElementById('question-text').textContent = data.question;
+        
+        const progress = (data.number / data.total) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+        
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        data.options.forEach((option, index) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option';
+            optionDiv.textContent = option;
+            optionDiv.onclick = () => selectAnswer(index);
+            optionsContainer.appendChild(optionDiv);
+        });
+        
+        document.getElementById('feedback').innerHTML = '';
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('next-btn').style.display = 'none';
+    } catch (error) {
+        console.error('Error loading question:', error);
+    }
+}
+
+async function selectAnswer(answerIndex) {
+    const options = document.querySelectorAll('.option');
+    options.forEach(opt => opt.style.pointerEvents = 'none');
+    
+    try {
+        const response = await fetch('/api/quiz/answer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ answer: answerIndex })
+        });
+        const data = await response.json();
+        
+        options[answerIndex].classList.add(data.correct ? 'correct' : 'incorrect');
+        if (!data.correct) {
+            options[data.correct_answer].classList.add('correct');
+        }
+        
+        const feedback = document.getElementById('feedback');
+        feedback.className = 'feedback ' + (data.correct ? 'correct' : 'incorrect');
+        feedback.innerHTML = `
+            <strong>${data.correct ? '✓ Correct!' : '✗ Incorrect'}</strong>
+            <p>${data.explanation}</p>
+        `;
+        
+        document.getElementById('next-btn').style.display = 'block';
+    } catch (error) {
+        console.error('Error submitting answer:', error);
+    }
+}
+
+document.getElementById('next-btn').addEventListener('click', () => {
+    loadQuestion();
+});
+
+async function showResults() {
+    try {
+        const response = await fetch('/api/quiz/results');
+        const data = await response.json();
+        
+        document.getElementById('score-percentage').textContent = Math.round(data.percentage) + '%';
+        document.getElementById('score-count').textContent = data.score;
+        document.getElementById('total-count').textContent = data.total;
+        
+        const messageDiv = document.getElementById('performance-message');
+        if (data.percentage >= 90) {
+            messageDiv.innerHTML = '<p class="excellent">🌟 Excellent! You have a strong grasp of cybersecurity concepts!</p>';
+        } else if (data.percentage >= 70) {
+            messageDiv.innerHTML = '<p class="good">👍 Good job! Keep studying to master all concepts.</p>';
+        } else {
+            messageDiv.innerHTML = '<p class="needs-improvement">📚 Review the study modules to improve your understanding.</p>';
+        }
+        
+        showSection('quiz-results');
+    } catch (error) {
+        console.error('Error loading results:', error);
+    }
+}
+
+function showSection(sectionId) {
+    document.querySelectorAll('.quiz-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(sectionId).classList.add('active');
+}
+</script>
+{% endblock %}

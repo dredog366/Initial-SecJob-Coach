@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Study Modules - SecJob Coach{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>📚 Study Modules</h1>
+        <p>Choose a module to begin your cybersecurity learning journey</p>
+    </div>
+    
+    <div class="modules-grid">
+        {% for module_id, module in modules.items() %}
+        <div class="module-card">
+            <h2>{{ module.title }}</h2>
+            <p class="module-topics-count">{{ module.topics|length }} Topics</p>
+            <ul class="topic-list">
+                {% for topic in module.topics[:3] %}
+                <li>{{ topic.name }}</li>
+                {% endfor %}
+                {% if module.topics|length > 3 %}
+                <li class="more-topics">+ {{ module.topics|length - 3 }} more topics</li>
+                {% endif %}
+            </ul>
+            <a href="/module/{{ module_id }}" class="btn btn-primary">Start Module</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

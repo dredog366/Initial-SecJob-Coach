@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}{{ module.title }} - SecJob Coach{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="module-header">
+        <a href="/modules" class="back-link">← Back to Modules</a>
+        <h1>{{ module.title }}</h1>
+    </div>
+    
+    <div class="module-content">
+        {% for topic in module.topics %}
+        <div class="topic-section">
+            <h2 class="topic-title">{{ loop.index }}. {{ topic.name }}</h2>
+            <div class="topic-content">
+                {{ topic.content|safe }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="module-navigation">
+        <a href="/modules" class="btn btn-secondary">← All Modules</a>
+        <a href="/quiz" class="btn btn-primary">Test Your Knowledge →</a>
+    </div>
+</div>
+{% endblock %}
